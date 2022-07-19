@@ -12,6 +12,21 @@ struct Color {
     blue: u8,
 }
 
+impl Color {
+    pub fn is_ok(red: i16, green: i16, blue: i16) -> bool {
+        if red < 0 || red > 256 {
+            return false;
+        }
+        if blue < 0 || blue > 256 {
+            return false;
+        }
+        if green < 0 || green > 256 {
+            return false;
+        }
+        return true;
+    }
+}
+
 // We will use this error type for these `TryFrom` conversions.
 #[derive(Debug, PartialEq)]
 enum IntoColorError {
@@ -21,7 +36,7 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
+//
 
 // Your task is to complete this implementation
 // and return an Ok result of inner type Color.
@@ -36,6 +51,14 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        if !Color::is_ok(tuple.0, tuple.1, tuple.2) {
+            return Err(IntoColorError::IntConversion);
+        }
+        Ok(Color {
+            red: tuple.0 as u8,
+            green: tuple.1 as u8,
+            blue: tuple.2 as u8,
+        })
     }
 }
 
@@ -43,6 +66,14 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        if !Color::is_ok(arr[0],  arr[1], arr[2]) {
+            return Err(IntoColorError::IntConversion);
+        }
+        Ok(Color {
+            red: arr[0] as u8,
+            green: arr[1] as u8,
+            blue: arr[2] as u8,
+        })
     }
 }
 
@@ -50,6 +81,17 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err(IntoColorError::BadLen)
+        }
+        if !Color::is_ok(slice[0],  slice[1], slice[2]) {
+            return Err(IntoColorError::IntConversion);
+        }
+        Ok(Color {
+            red: slice[0] as u8,
+            green: slice[1] as u8,
+            blue: slice[2] as u8,
+        })
     }
 }
 
